@@ -57,13 +57,15 @@ namespace TechJobsConsole
                     // What is their search term?
                     Console.WriteLine("\nSearch term: ");
                     string searchTerm = Console.ReadLine();
-
+                    string upperSearchTerm = searchTerm.ToUpper();
                     List<Dictionary<string, string>> searchResults;
 
                     // Fetch results
                     if (columnChoice.Equals("all"))
                     {
-                        Console.WriteLine("Search all fields not yet implemented.");
+                        //Console.WriteLine("Search all fields not yet implemented.");
+                        searchResults = JobData.FindbyValue(upperSearchTerm);
+                        PrintJobs(searchResults);
                     }
                     else
                     {
@@ -116,9 +118,32 @@ namespace TechJobsConsole
             return choiceKeys[choiceIdx];
         }
 
+
         private static void PrintJobs(List<Dictionary<string, string>> someJobs)
         {
-            Console.WriteLine("printJobs is not implemented yet");
+            if (someJobs.Count == 0)
+            { Console.WriteLine("No results found."); }
+            else
+            {
+                for (int i = 0; i < someJobs.Count; i++)
+                {
+                    Console.WriteLine("Listing Number " + (i));
+
+                    foreach (KeyValuePair<string, string> kvp in someJobs[i])
+
+                    {
+                        Console.WriteLine("{0}: {1}", kvp.Key, kvp.Value);
+                    }
+
+                    {
+                        Console.WriteLine("\n   ***   \n");
+                    }
+                }
+            }
+
         }
     }
+
 }
+        
+    
