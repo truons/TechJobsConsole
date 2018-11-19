@@ -66,11 +66,11 @@ namespace TechJobsConsole
 
             foreach (Dictionary<string, string> row in AllJobs)
             {
-                foreach (KeyValuePair<string, string> kvp in row)
+                foreach (KeyValuePair<string, string> char_search in row)
                 {
-                    //09string aValue = kvp.Value.ToUpper();
+                    //string aValue = search.Value.ToUpper();
 
-                    if (kvp.Value.ToLower().Contains(kvp.Value.ToLower()) && !jobs.Contains(row))
+                    if (char_search.Value.ToLower().Contains(char_search.Value.ToLower()) && !jobs.Contains(row))
                     {
                         jobs.Add(row);
                         continue;
