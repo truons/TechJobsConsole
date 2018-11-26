@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -14,6 +15,11 @@ namespace TechJobsConsole
         {
             LoadData();
             return AllJobs;
+        }
+
+        private static void LoadData()
+        {
+            throw new NotImplementedException();
         }
 
         /*
@@ -58,111 +64,119 @@ namespace TechJobsConsole
             return jobs;
         }
 
-        public static List<Dictionary<string, string>> FindbyValue(string searchTerm)
+        public static List<Dictionary<string, string>> FindByValue(string value)
         {
+            // load data, if not already loaded
             LoadData();
 
             List<Dictionary<string, string>> jobs = new List<Dictionary<string, string>>();
 
+            value = value.ToLower();
+
             foreach (Dictionary<string, string> row in AllJobs)
             {
-                foreach (KeyValuePair<string, string> char_search in row)
+                foreach (var KeyValuePair in row)
                 {
-                    //string aValue = search.Value.ToUpper();
-
-                    if (char_search.Value.ToLower().Contains(char_search.Value.ToLower()) && !jobs.Contains(row))
+                    if (KeyValuePair.Value.ToLower().Contains(value) && !jobs.Contains(row))
                     {
                         jobs.Add(row);
-                        continue;
                     }
+
                 }
             }
+
             return jobs;
 
         }
 
+    }
 
-        /*
-         * Load and parse data from job_data.csv
-         */
-        private static void LoadData()
+
+    /*
+     * Load and parse data from job_data.csv
+     */
+    private static void LoadData()
+    {
+
+        if (IsDataLoaded)
         {
-
-            if (IsDataLoaded)
-            {
-                return;
-            }
-
-            List<string[]> rows = new List<string[]>();
-
-            using (StreamReader reader = File.OpenText("job_data.csv"))
-            {
-                while (reader.Peek() >= 0)
-                {
-                    string line = reader.ReadLine();
-                    string[] rowArrray = CSVRowToStringArray(line);
-                    if (rowArrray.Length > 0)
-                    {
-                        rows.Add(rowArrray);
-                    }
-                }
-            }
-
-            string[] headers = rows[0];
-            rows.Remove(headers);
-
-            // Parse each row array into a more friendly Dictionary
-            foreach (string[] row in rows)
-            {
-                Dictionary<string, string> rowDict = new Dictionary<string, string>();
-
-                for (int i = 0; i < headers.Length; i++)
-                {
-                    rowDict.Add(headers[i], row[i]);
-                }
-                AllJobs.Add(rowDict);
-            }
-
-            IsDataLoaded = true;
+            return;
         }
 
-        /*
-         * Parse a single line of a CSV file into a string array
-         */
-        private static string[] CSVRowToStringArray(string row, char fieldSeparator = ',', char stringSeparator = '\"')
-        {
-            bool isBetweenQuotes = false;
-            StringBuilder valueBuilder = new StringBuilder();
-            List<string> rowValues = new List<string>();
+        List<string[]> rows = new List<string[]>();
 
-            // Loop through the row string one char at a time
-            foreach (char c in row.ToCharArray())
+        using (StreamReader reader = File.OpenText("job_data.csv"))
+        {
+            while (reader.Peek() >= 0)
             {
-                if ((c == fieldSeparator && !isBetweenQuotes))
+                string line = reader.ReadLine();
+                string[] rowArrray = CSVRowToStringArray(line);
+                if (rowArrray.Length > 0)
                 {
-                    rowValues.Add(valueBuilder.ToString());
-                    valueBuilder.Clear();
+                    rows.Add(rowArrray);
+                }
+            }
+        }
+
+        string[] headers = rows[0];
+        rows.Remove(headers);
+
+        // Parse each row array into a more friendly Dictionary
+        foreach (string[] row in rows)
+        {
+            Dictionary<string, string> rowDict = new Dictionary<string, string>();
+
+            for (int i = 0; i < headers.Length; i++)
+            {
+                rowDict.Add(headers[i], row[i]);
+            }
+            AllJobs.Add(rowDict);
+        }
+
+        IsDataLoaded = true;
+    }
+
+    private string[] CSVRowToStringArray(string line)
+    {
+        throw new NotImplementedException();
+    }
+
+    /*
+     * Parse a single line of a CSV file into a string array
+     */
+    private static string[] CSVRowToStringArray(string row, char fieldSeparator = ',', char stringSeparator = '\"')
+    {
+        bool isBetweenQuotes = false;
+        StringBuilder valueBuilder = new StringBuilder();
+        List<string> rowValues = new List<string>();
+
+        // Loop through the row string one char at a time
+        foreach (char c in row.ToCharArray())
+        {
+            if ((c == fieldSeparator && !isBetweenQuotes))
+            {
+                rowValues.Add(valueBuilder.ToString());
+                valueBuilder.Clear();
+            }
+            else
+            {
+                if (c == stringSeparator)
+                {
+                    isBetweenQuotes = !isBetweenQuotes;
                 }
                 else
                 {
-                    if (c == stringSeparator)
-                    {
-                        isBetweenQuotes = !isBetweenQuotes;
-                    }
-                    else
-                    {
-                        valueBuilder.Append(c);
-                    }
+                    valueBuilder.Append(c);
                 }
             }
-
-            // Add the final value
-            rowValues.Add(valueBuilder.ToString());
-            valueBuilder.Clear();
-
-            return rowValues.ToArray();
-
         }
-        
+
+        // Add the final value
+        rowValues.Add(valueBuilder.ToString());
+        valueBuilder.Clear();
+
+        return rowValues.ToArray();
     }
 }
+
+
