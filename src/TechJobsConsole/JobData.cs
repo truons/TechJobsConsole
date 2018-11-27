@@ -17,10 +17,7 @@ namespace TechJobsConsole
             return AllJobs;
         }
 
-        private static void LoadData()
-        {
-            throw new NotImplementedException();
-        }
+
 
         /*
          * Returns a list of all values contained in a given column,
@@ -80,6 +77,7 @@ namespace TechJobsConsole
                     if (KeyValuePair.Value.ToLower().Contains(value) && !jobs.Contains(row))
                     {
                         jobs.Add(row);
+                        continue;
                     }
 
                 }
@@ -89,94 +87,88 @@ namespace TechJobsConsole
 
         }
 
-    }
 
 
-    /*
-     * Load and parse data from job_data.csv
-     */
-    private static void LoadData()
-    {
+        /*
+         * Load and parse data from job_data.csv
+         */
 
-        if (IsDataLoaded)
+        private static void LoadData()
         {
-            return;
-        }
 
-        List<string[]> rows = new List<string[]>();
-
-        using (StreamReader reader = File.OpenText("job_data.csv"))
-        {
-            while (reader.Peek() >= 0)
+            if (IsDataLoaded)
             {
-                string line = reader.ReadLine();
-                string[] rowArrray = CSVRowToStringArray(line);
-                if (rowArrray.Length > 0)
+                return;
+            }
+
+            List<string[]> rows = new List<string[]>();
+
+            using (StreamReader reader = File.OpenText("job_data.csv"))
+            {
+
+                while (reader.Peek() >= 0)
                 {
-                    rows.Add(rowArrray);
+                    string line = reader.ReadLine();
+                    string[] rowArray = CSVRowToStringArray(line);
+                    if (rowArray.Length > 0)
+                    {
+                        rows.Add(rowArray);
+                    }
                 }
             }
-        }
 
-        string[] headers = rows[0];
-        rows.Remove(headers);
+            string[] headers = rows[0];
+            rows.Remove(headers);
 
-        // Parse each row array into a more friendly Dictionary
-        foreach (string[] row in rows)
-        {
-            Dictionary<string, string> rowDict = new Dictionary<string, string>();
-
-            for (int i = 0; i < headers.Length; i++)
+            foreach (string[] row in rows)
             {
-                rowDict.Add(headers[i], row[i]);
-            }
-            AllJobs.Add(rowDict);
-        }
+                Dictionary<string, string> rowDict = new Dictionary<string, string>();
 
-        IsDataLoaded = true;
-    }
-
-    private string[] CSVRowToStringArray(string line)
-    {
-        throw new NotImplementedException();
-    }
-
-    /*
-     * Parse a single line of a CSV file into a string array
-     */
-    private static string[] CSVRowToStringArray(string row, char fieldSeparator = ',', char stringSeparator = '\"')
-    {
-        bool isBetweenQuotes = false;
-        StringBuilder valueBuilder = new StringBuilder();
-        List<string> rowValues = new List<string>();
-
-        // Loop through the row string one char at a time
-        foreach (char c in row.ToCharArray())
-        {
-            if ((c == fieldSeparator && !isBetweenQuotes))
-            {
-                rowValues.Add(valueBuilder.ToString());
-                valueBuilder.Clear();
-            }
-            else
-            {
-                if (c == stringSeparator)
+                for (int i = 0; i < headers.Length; i++)
                 {
-                    isBetweenQuotes = !isBetweenQuotes;
+                    rowDict.Add(headers[i], row[i]);
                 }
+                AllJobs.Add(rowDict);
+            }
+
+            IsDataLoaded = true;
+        }
+
+
+
+        private static string[] CSVRowToStringArray(string row, char fieldSeparator = ',', char stringSeparator = '\"')
+        {
+            bool isBetweenQuotes = false;
+            StringBuilder valueBuilder = new StringBuilder();
+            List<string> rowValues = new List<string>();
+
+            foreach (char c in row.ToCharArray())
+            {
+                if ((c == fieldSeparator && !isBetweenQuotes))
+                {
+                    rowValues.Add(valueBuilder.ToString());
+                    valueBuilder.Clear();
+                }
+
                 else
                 {
-                    valueBuilder.Append(c);
+                    if (c == stringSeparator)
+                    {
+                        isBetweenQuotes = !isBetweenQuotes;
+                    }
+                    else
+                    {
+                        valueBuilder.Append(c);
+                    }
                 }
             }
+
+
+            rowValues.Add(valueBuilder.ToString());
+            valueBuilder.Clear();
+
+            return rowValues.ToArray();
         }
-
-        // Add the final value
-        rowValues.Add(valueBuilder.ToString());
-        valueBuilder.Clear();
-
-        return rowValues.ToArray();
     }
 }
-
 
